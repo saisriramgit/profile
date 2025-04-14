@@ -1,0 +1,10 @@
+---
+import InteractiveCounter from "../components/InteractiveCounter";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="User profile">
+  <h2>Welcome to my profile</h2>
+  <p>My profile contains all my work and projects</p>
+  <InteractiveCounter client:load />
+</BaseLayout>
