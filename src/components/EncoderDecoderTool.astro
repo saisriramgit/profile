@@ -1,0 +1,139 @@
+---
+// src/components/EncoderDecoderTool.astro
+// No server-side props needed for this simple example
+---
+
+<div class="bg-neutral-800 p-6 rounded-lg shadow-lg border border-neutral-700">
+  <h3 class="text-xl font-semibold text-white mb-3">Text Encode/Decoder</h3>
+  <p class="text-neutral-400 text-sm mb-4">
+    Simple base64 and URL Encoding/Decoding
+  </p>
+  <div class="space-y-4">
+    <div>
+      <label
+        for="inputText"
+        class="block text-sm font-medium text-neutral-300 mb-1"
+        >Input Text:</label
+      >
+      <textarea
+        id="inputText"
+        rows="4"
+        class="block w-full bg-neutral-700 border-transparent rounded-md p-3 text-white placeholder-neutral-500 focus:ring-[#ff0] focus:border-[#ff0] sm:text-sm"
+        placeholder="Enter text here..."></textarea>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        id="encodeBase64Btn"
+        class="py-2 px-4 bg-[#ff0] text-neutral-900 font-medium rounded-md text-sm hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-800 focus:ring-[#ff0]"
+        >Encode (Base64)
+      </button>
+      <button
+        id="decodeBase64Btn"
+        class="py-2 px-4 bg-neutral-600 text-white font-medium rounded-md text-sm hover:bg-neutral-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-800 focus:ring-neutral-500"
+      >
+        Decode (Base64)
+      </button>
+      <button
+        id="encodeUrlBtn"
+        class="py-2 px-4 bg-[#ff0] text-neutral-900 font-medium rounded-md text-sm hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-800 focus:ring-[#ff0]"
+        >Encode (URL)
+      </button>
+      <button
+        id="decodeUrlBtn"
+        class="py-2 px-4 bg-neutral-600 text-white font-medium rounded-md text-sm hover:bg-neutral-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-800 focus:ring-neutral-500"
+        >Decode (URL)
+      </button>
+    </div>
+
+    <div>
+      <label
+        for="outputText"
+        class="block text-sm font-medium text-neutral-300 mb-1">Output:</label
+      >
+      <textarea
+        id="outputText"
+        rows="4"
+        readonly
+        class="block w-full bg-neutral-700 border-transparent rounded-md p-3 text-white placeholder-neutral-500 sm:text-sm cursor-not-allowed"
+        placeholder="Result will appear here..."></textarea>
+      <button
+        id="copyOutputBtn"
+        class="mt-2 py-1 px-3 bg-neutral-600 text-white font-medium rounded-md text-xs hover:bg-neutral-500 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-offset-neutral-800 focus:ring-neutral-500"
+        >Copy Output</button
+      >
+    </div>
+  </div>
+</div>
+
+<script>
+  import { navigate } from "astro:transitions/client";
+
+  const inputText = document.getElementById("inputText") as HTMLTextAreaElement;
+  const outputText = document.getElementById(
+    "outputText"
+  ) as HTMLTextAreaElement;
+  const encodeBase64Btn = document.getElementById("encodeBase64Btn");
+  const decodeBase64Btn = document.getElementById("decodeBase64Btn");
+  const encodeUrlBtn = document.getElementById("encodeUrlBtn");
+  const decodeUrlBtn = document.getElementById("decodeUrlBtn");
+  const copyOutputBtn = document.getElementById("copyOutputBtn");
+
+  encodeBase64Btn?.addEventListener("click", () => {
+    try {
+      outputText.value = btoa(inputText.value);
+    } catch (e) {
+      outputText.value = "Enter encoding text";
+      console.error("Base64 Encoding error: ", e);
+    }
+  });
+
+  decodeBase64Btn?.addEventListener("click", () => {
+    try {
+      const binaryString = atob(inputText.value);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      outputText.value = new TextDecoder().decode(bytes);
+    } catch (e) {
+      outputText.value = "Error decoding text. Invalid Base64 input";
+      console.error("Base64 decoding error: ", e);
+    }
+  });
+
+  encodeUrlBtn?.addEventListener("click", () => {
+    try {
+      outputText.value = encodeURIComponent(inputText.value);
+    } catch (e) {
+      outputText.value = "Error encoding URL component";
+      console.error("URL encoding error: ", e);
+    }
+  });
+
+  decodeUrlBtn?.addEventListener("click", () => {
+    try {
+      outputText.value = decodeURIComponent(inputText.value);
+    } catch (e) {
+      outputText.value = "Error decoding URL component";
+      console.error("URL decoding error: ", e);
+    }
+  });
+
+  copyOutputBtn?.addEventListener("click", () => {
+    if (outputText.value) {
+      navigator.clipboard
+        .writeText(outputText.value)
+        .then(() => {
+          copyOutputBtn.textContent = "Copied";
+          setTimeout(() => {
+            copyOutputBtn.textContent = "Copy Output";
+          }, 1500);
+        })
+        .catch((err) => {
+          console.error("Failed to copy error: ", err);
+          alert("Failed to copy text");
+        });
+    }
+  });
+</script>
